@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Running distributed tests &#8212; LiberTEM 0.4.0.dev0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Authorship policy" href="authorship.html" />
+    <link rel="prev" title="Releasing" href="releasing.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="running-distributed-tests">
+<h1>Running distributed tests<a class="headerlink" href="#running-distributed-tests" title="Permalink to this headline">¶</a></h1>
+<p>To test the behavior of the distributed parts of LiberTEM, there are now a
+few automated test cases available. Because of the distributed nature of the
+tests, they need to be run across multiple network nodes (computers, VMs, or
+containers). We ship a <code class="code docutils literal notranslate"><span class="pre">docker-compose</span></code> configuration to spin up a
+scheduler and two workers as separate docker containers.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>To run the distributed tests, you need to install (a current version of) <code class="code docutils literal notranslate"><span class="pre">docker</span></code>
+and <code class="code docutils literal notranslate"><span class="pre">docker-compose</span></code>. See
+<a class="reference external" href="https://docs.docker.com/install/">the official docker documentation</a> to get started.
+To start the test environment, change to the <code class="code docutils literal notranslate"><span class="pre">packaging/docker/</span></code> directory and
+run the following:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose up
+</pre></div>
+</div>
+<p>Note that you need to run the above command as a user that can access the docker daemon,
+for example by being in the <code class="code docutils literal notranslate"><span class="pre">docker</span></code> group. The containers are running as long as
+the <code class="code docutils literal notranslate"><span class="pre">docker-compose</span></code> command is running, so you can stop them using <code class="code docutils literal notranslate"><span class="pre">Ctrl-C</span></code>.</p>
+<p>You can then run the distributed tests using (from the repository root directory):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">DASK_SCHEDULER_ADDRESS</span><span class="o">=</span>tcp://localhost:8786 pytest -m dist tests/
+</pre></div>
+</div>
+<p>Or via <code class="code docutils literal notranslate"><span class="pre">tox</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">DASK_SCHEDULER_ADDRESS</span><span class="o">=</span>tcp://localhost:8786 tox -e py37 -- -m dist tests/
+</pre></div>
+</div>
+<p>After changing LiberTEM code, you need to rebuild and restart the containers. This can be
+done by running:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose build <span class="o">&amp;&amp;</span> docker-compose up
+</pre></div>
+</div>
+<p>Or, as one command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose up --build
+</pre></div>
+</div>
+<p>The rebuild should be faster than the initial build, which is accomplished by careful
+use of the layer caching feature of docker. This also menas that you need to update
+the <code class="code docutils literal notranslate"><span class="pre">packaging/docker/requirements.txt</span></code> file by running the provided
+script <code class="code docutils literal notranslate"><span class="pre">update_reqs.sh</span></code> when the dependencies of LiberTEM change, or when new
+versions of dependencies are released.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">GUI usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">Loading data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="udf.html">User-defined functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips.html">Tips and tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="why_python.html">Why Python?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gsoc.html">GSoC 2020 ideas</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="contributing.html">Contributing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#development-principles">Development principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#code-contributions">Code contributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#running-the-tests">Running the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#code-style">Code style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#building-the-documentation">Building the documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#building-the-client">Building the client</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="contributing.html#advanced">Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authorship.html">Authorship policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="contributing.html">Contributing</a><ul>
+      <li>Previous: <a href="releasing.html" title="previous chapter">Releasing</a></li>
+      <li>Next: <a href="authorship.html" title="next chapter">Authorship policy</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, LiberTEM Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/dist_tests.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
